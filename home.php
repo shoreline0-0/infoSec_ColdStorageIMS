@@ -1,16 +1,7 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+        header("X-Content-Type-Options: nosniff");
+    
 
     session_start();
 
@@ -34,10 +25,11 @@
     $_SESSION['LAST_ACTIVITY'] = time();
 
     include 'dbconn.php';
+
+    $role = $_SESSION['Role'];
 ?>
 
 <!DOCTYPE html>
-
 <html>
     <meta http-equiv = "refresh" content = "300; url = index.php">
     <head>
@@ -65,25 +57,9 @@
                     </button> 
                 </div>
                 <div class = "box2">
-                    <img src = "assets/icon_batch.png" class = "icons">
-                    <button type = "button">
-                        <a href = "viewBatch.php">
-                            Batch
-                        </a>
-                    </button> 
-                </div> 
-                <div class = "box2">
-                    <img src = "assets/icon_inventory.png" class = "icons">
-                    <button type = "button">
-                        <a href = "viewInventory.php">
-                            Inventory
-                        </a>
-                    </button> 
-                </div> 
-                <div class = "box2">
                     <img src = "assets/icon_product.png" class = "icons">
                     <button type = "button">
-                        <a href = "viewProduct.php">
+                        <a href = "viewProducts.php">
                             Product
                         </a>
                     </button> 
@@ -96,6 +72,7 @@
                         </a>
                     </button> 
                 </div> 
+                <?php if ($role == "Super Admin"): ?>
                 <div class = "box2">
                     <img src = "assets/icon_transactions.png" class = "icons">
                     <button type = "button">
@@ -104,7 +81,7 @@
                         </a>
                     </button> 
                 </div> 
-                <div class = "box2"> <!-- admin only -->
+                <div class = "box2">
                     <img src = "assets/icon_users.png" class = "icons">
                     <button type = "button">
                         <a href = "viewUsers.php">
@@ -112,6 +89,7 @@
                         </a>
                     </button> 
                 </div> 
+                <?php endif; ?>
             </div>
         </div> 
     </body> 

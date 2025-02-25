@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -35,7 +25,10 @@
 
     include 'dbconn.php';
 
-    $sql = "SELECT * FROM alerts";
+    $sortOrder = isset($_GET['sort']) && $_GET['sort'] == 'asc' ? 'ASC' : 'DESC';
+    $nextSortOrder = ($sortOrder == 'ASC') ? 'desc' : 'asc';
+
+    $sql = "SELECT * FROM alerts ORDER BY AlertID $sortOrder";
     $result = mysqli_query($conn, $sql);
 ?>
 
@@ -65,30 +58,29 @@
             <table class = "tableStyle">
                 <thead>
                     <tr>
-                        <th> Alert ID </th>
-                        <th> Product ID </th>    
-                        <th> Storage ID  </th>
+                        <th> Alert ID 
+                            <a href="?sort=<?php echo $nextSortOrder; ?>">
+                                <?php echo ($sortOrder == 'ASC') ? '⬇️' : '⬆️'; ?>
+                            </a>
+                        </th>
+                        <th> Type </th>    
+                        <th> Related ID  </th>
                         <th> Name </th>
                         <th> Time </th>                            
-                        <th> Status </th>
-                        <th> Resolved On: </th>
-                        <th> Resolved By: </th>
                         <th> Notes </th>
                     </tr>
                 </thead>
                 <tbody>
+                    <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                     <?php
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 echo "<tr>";
                                 echo "<td>" . $row["AlertID"] . "</td>";
-                                echo "<td>" . $row["ProductID"] . "</td>";                                        
-                                echo "<td>" . $row["StorageID"] . "</td>";
+                                echo "<td>" . $row["AlertType"] . "</td>";                                        
+                                echo "<td>" . $row["RelatedID"] . "</td>";
                                 echo "<td>" . $row["AlertName"] . "</td>";
                                 echo "<td>" . $row["AlertTime"] . "</td>";
-                                echo "<td>" . $row["Status"] . "</td>";
-                                echo "<td>" . $row["ResolvedTime"] . "</td>";
-                                echo "<td>" . $row["ResolvedBy"] . "</td>";
                                 echo "<td>" . $row["Notes"] . "</td>";
                             }
                         } else {
@@ -96,6 +88,7 @@
                         }
                         mysqli_close($conn);
                     ?>
+                    <?php endwhile; ?>
                 </tbody>
             </table>
         </div> 

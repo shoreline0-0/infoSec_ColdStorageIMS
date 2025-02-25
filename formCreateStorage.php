@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -44,7 +34,7 @@
     unset (
         $_SESSION['errors'],
         $_SESSION['StorageName'],
-        $_SESSION['StorageCapacity']
+        $_SESSION['StorageCapacity'],
         $_SESSION['StorageTemperature']
     );
 ?>
@@ -75,7 +65,7 @@
         <div class = "addStorage">
             <div class = "box1">
                 <form method='post' action='addStorage.php'>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">    
+                    <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
                     <input type = 'hidden' id='StorageID' name = 'StorageID' />
                     <label for='StorageName'>
                         Storage Name:
@@ -101,6 +91,10 @@
                         </span>
                         <br>
                     <?php endif; ?>
+                    <br>
+                    <label for='StorageTemperature'>
+                        Storage Temperature:
+                    </label>
                     <br>
                     <input type = 'number' id='StorageTemperature' name = 'StorageTemperature' value = '<?php echo htmlspecialchars($StorageTemperature); ?>'/>
                     <br>

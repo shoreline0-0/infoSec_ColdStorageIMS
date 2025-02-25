@@ -1,23 +1,25 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
+
+    session_start();
+    
     include 'dbconn.php';
+
+    $errors = $_SESSION['errors'] ?? "";
+    $Email = $_SESSION['Email'] ?? "";
+
+    unset(
+        $_SESSION['errors'],
+        $_SESSION['Email']
+    );
 ?>
 
 <!DOCTYPE html>
 
 <html>
     <head>
+        <link rel="stylesheet" href="style.css">
         <title> Log-in </title>
     </head>
     <body>
@@ -28,35 +30,33 @@
             <div>
                 <?php if (isset($errors["general"])): ?>
                     <p class = "error">
-                        <?php echo $_SESSION['csrf_token']>> ''; ?>
+                        <?php echo $errors['general']; ?>
                     </p>
                 <?php endif; ?>
             </div>
             <div class = "box1">
                 <form method = "post" action = "verifyLogin.php">
-                    <input type = "hidden" name = "csrf_token" value = "<?php echo $_SESSION['csrf_token']; ?>">
-                    <br><br>
-                    <label for = "email">
+                    <label for = "Email">
                         Email:
                     </label>
                     <br>
-                    <input type = "text" id = "email" name = "email" value = "<?php echo htmlspecialchars($email); ?>"/>
+                    <input type = "text" id = "Email" name = "Email" value = "<?php echo htmlspecialchars($Email); ?>"/>
                     <br>
-                    <?php if (isset($errors["email"])): ?>
+                    <?php if (isset($errors["Email"])): ?>
                         <span class = "error">
-                            <?php echo $errors["email"]; ?>
+                            <?php echo $errors["Email"]; ?>
                         </span>
                     <?php endif; ?>
                     <br> <br>
-                    <label for = "password">
+                    <label for = "Password">
                         Password:
                     </label>
                     <br>
-                    <input type = "password" id = "password" name = "password" />
+                    <input type = "Password" id = "Password" name = "Password" />
                     <br>
-                    <?php if (isset($errors["password"])): ?>
+                    <?php if (isset($errors["Password"])): ?>
                         <span class = "error">
-                            <?php echo $errors["password"]; ?>
+                            <?php echo $errors["Password"]; ?>
                         </span>
                     <?php endif; ?>
                     <br> <br>

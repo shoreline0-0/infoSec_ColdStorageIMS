@@ -1,16 +1,7 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+        header("X-Content-Type-Options: nosniff");
+    
 
     session_start();
 
@@ -47,10 +38,10 @@
     if ($StorageID) {
         $sql = "SELECT * FROM storage WHERE StorageID = '$StorageID'";
         $result = mysqli_query($conn,$sql);
-        $difficulty = mysqli_fetch_assoc($result;)
+        $storage = mysqli_fetch_assoc($result);
 
-        if (!storage) {
-            echo "No storage found."
+        if (!$storage) {
+            echo "No storage found.";
         }
     }
 ?>
@@ -81,8 +72,8 @@
         <div class = "updateStorage">
             <div class = "box1">
                 <form method='post' action='updateStorage.php'>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">    
-                    <input type = 'hidden' id='StorageID' name = 'StorageID' />
+                    <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
+                    <input type = 'hidden' id='StorageID' name = 'StorageID' value='<?php echo htmlspecialchars($StorageID);?>'/>
                     <label for='StorageName'>
                         Storage Name:
                     </label>
@@ -107,6 +98,10 @@
                         </span>
                         <br>
                     <?php endif; ?>
+                    <br>
+                    <label for='StorageTemperature'>
+                        Storage Temperature:
+                    </label>
                     <br>
                     <input type = 'number' id='StorageTemperature' name = 'StorageTemperature' value = '<?php echo htmlspecialchars($StorageTemperature); ?>'/>
                     <br>

@@ -1,17 +1,7 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
-
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
+    
     session_start();
 
     if (!isset($_SESSION['UserID'])) {
@@ -34,6 +24,10 @@
     $_SESSION['LAST_ACTIVITY'] = time();
 
     include 'dbconn.php';
+    include 'checkAlerts.php';
+
+    $productID = $_POST['ProductID'];
+    $storageID = $_POST['StorageID'];
 
     $errors = [];
     $ProductName = $CurrentStock = "";
@@ -49,6 +43,9 @@
         $ProductID = $_POST['ProductID'];
         $ProductName = htmlspecialchars($_POST['ProductName'], ENT_QUOTES, 'UTF-8');
         $CurrentStock = filter_input(INPUT_POST, 'CurrentStock', FILTER_VALIDATE_INT);
+        $ProductExpiryDate = filter_input(INPUT_POST, 'ProductExpiryDate', FILTER_SANITIZE_STRING);
+        $StorageID = $_POST['StorageID'];
+
 
         if (empty($ProductName)) {
             $errors['ProductName'] = "Product name required.";
@@ -56,30 +53,62 @@
             $errors['ProductName'] = "Product name too long.";
         }
     
-        if ($CurrentStock < 0) {
+        if ($CurrentStock === false || $CurrentStock < 0) {
             $errors['CurrentStock'] = "Invalid stock.";
+        }
+
+        if (empty($ProductExpiryDate)) {
+            $errors['ProductExpiryDate'] = "Expiry date required.";
         }
     
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['ProductName'] = $ProductName;
             $_SESSION['CurrentStock'] = $CurrentStock;
+            $_SESSION['ProductExpiryDate'] = $ProductExpiryDate;
             
-            header("Location: formEditProduct.php");
+            header("Location: formUpdateProduct.php");
             exit();
         } else {
             $sql = 
             "UPDATE product 
             SET 
                 ProductName = ?, 
-                CurrentStock = ?
+                CurrentStock = ?,
+                ProductExpiryDate = ?,
+                StorageID = ?
             WHERE ProductID = ?";
             
             $stmt = mysqli_prepare($conn, $sql);
     
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "sii", $ProductName, $CurrentStock, $ProductID);
+                mysqli_stmt_bind_param($stmt, "sisii", $ProductName, $CurrentStock, $ProductExpiryDate, $StorageID, $ProductID);
                 if (mysqli_stmt_execute($stmt)) {
+                    $UserID = $_SESSION['UserID'];
+                    $TransactionType = "Updated product";
+                    $Details = "ID: ". $ProductID ." - " . $ProductName . " (Quantity: " . $CurrentStock . ")";
+                            
+                    $sqlLog = "INSERT INTO transactionlog (TransactionType, UserID, TransactionDate, Details) VALUES (?, ?, NOW(), ?)";
+                    if ($stmtLog = mysqli_prepare($conn, $sqlLog)) {
+                        mysqli_stmt_bind_param($stmtLog, "sis", $TransactionType, $UserID, $Details);                            
+                        mysqli_stmt_execute($stmtLog);
+                        mysqli_stmt_close($stmtLog);
+                    }
+
+                    if (mysqli_stmt_execute($stmt)) {
+                        if (mysqli_stmt_affected_rows($stmt) > 0) {
+                            echo "Update successful!";
+                        } else {
+                            echo "No rows updated. Maybe values are the same?";
+                            echo "ID: ". $ProductID ." - " . $ProductName . " (Quantity: " . $CurrentStock . ")";
+                        }
+                    } else {
+                        echo "MySQL Error: " . mysqli_stmt_error($stmt);
+                    }
+                    
+                    checkProductAlert($productID, $conn);
+                    checkStorageAlert($storageID, $conn);
+
                     header("Location: viewProducts.php?product=updated");
                     exit();
                 } else {

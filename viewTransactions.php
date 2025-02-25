@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -35,7 +25,10 @@
 
     include 'dbconn.php';
 
-    $sql = "SELECT * FROM transactionlog";
+    $sortOrder = isset($_GET['sort']) && $_GET['sort'] == 'asc' ? 'ASC' : 'DESC';
+    $nextSortOrder = ($sortOrder == 'ASC') ? 'desc' : 'asc';
+
+    $sql = "SELECT * FROM transactionlog ORDER BY TransactionID $sortOrder";
     $result = mysqli_query($conn, $sql);
 ?>
 
@@ -65,31 +58,35 @@
             <table class = "tableStyle">
                 <thead>
                     <tr>
-                        <th> Transaction ID </th>
+                        <th> Transaction ID 
+                            <a href="?sort=<?php echo $nextSortOrder; ?>">
+                                <?php echo ($sortOrder == 'ASC') ? '⬇️' : '⬆️'; ?>
+                            </a>
+                        </th>
                         <th> Transaction Type </th>    
-                        <th> Product ID  </th>
                         <th> User ID </th>
                         <th> Transaction Date </th>
-                        <th> Notes </th>
+                        <th> Details </th>
                     </tr>                    
                 </thead>
                 <tbody>
+                    <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                     <?php
                         if (mysqli_num_rows($result) > 0) {
                             while ($row = mysqli_fetch_assoc($result)) {
                                 echo "<tr>";
                                     echo "<td>" . $row["TransactionID"] . "</td>";
                                     echo "<td>" . $row["TransactionType"] . "</td>";                                        
-                                    echo "<td>" . $row["ProductID"] . "</td>";
                                     echo "<td>" . $row["UserID"] . "</td>";
                                     echo "<td>" . $row["TransactionDate"] . "</td>";
-                                    echo "<td>" . $row["Notes"] . "</td>";
+                                    echo "<td>" . $row["Details"] . "</td>";
                             }
                         } else {
                             echo "<tr><td>No records.</td></tr>";
                         }
                         mysqli_close($conn);
                     ?>
+                    <?php endwhile; ?>                    
                 </tbody>                
             </table>
         </div> 
