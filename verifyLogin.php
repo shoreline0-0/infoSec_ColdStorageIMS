@@ -1,80 +1,72 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
+    session_start();
 
     include 'dbconn.php';
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         $errors = [];
-        $email = "";
+        $Email = "";
 
-        $email = filter_var($POST["email"], FILTER_SANITIZE_EMAIL);
-        $loginPW = htmlspecialchars(trim($_POST["password"]), ENT_QUOTES, "UTF-8");
-        //$hashedInput = hash("sha256", $loginPW);
+        $Email = filter_var($_POST["Email"], FILTER_SANITIZE_EMAIL);
+        $loginPW = htmlspecialchars(trim($_POST["Password"]), ENT_QUOTES, "UTF-8");
+        $hashedInput = hash("sha256", $loginPW);
 
-        if (empty($email)) {
-            $errors["email"] = "Email required.";
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors["email"] = "Invalid email.";
+        if (empty($Email)) {
+            $errors["Email"] = "Email required.";
+        } elseif (!filter_var($Email, FILTER_VALIDATE_EMAIL)) {
+            $errors["Email"] = "Invalid Email.";
         }
 
         if (empty($loginPW)) {
-            $errors["password"] = "Password required.";
+            $errors["Password"] = "Password required.";
         }
 
         if(!empty($errors)) {
             $_SESSION["errors"] = $errors;
-            $_SESSION["email"] = $email;
+            $_SESSION["Email"] = $Email;
 
-            header("Location: login.php")
+            header("Location: login.php");
             exit();
         }
 
         $sql = "SELECT * FROM users WHERE Email = ?";
 
         if ($stmt = mysqli_prepare($conn, $sql)) {
-            mysqli_stmt_bind_param($stmt, "s", $email);
+            mysqli_stmt_bind_param($stmt, "s", $Email);
             mysqli_stmt_execute($stmt);
             $result = mysqli_stmt_get_result($stmt);
         
             if (mysqli_num_rows($result) == 1) {
                 $user = mysqli_fetch_assoc($result);
-                $hashedPW = $user['password'];
+                $hashedPW = $user['Password'];
 
                 $access = 'login';
         
                 if ($hashedInput == $hashedPW) {
-                    $_SESSION['UserID'] = $user['userID'];
+                    $_SESSION['UserID'] = $user['UserID'];
                     $_SESSION['FirstName'] = $user['FirstName'];
                     $_SESSION['Role'] = $user['Role'];
 
+                    header("Location: home.php");
                 } else {
-                    $errors['password'] = "Incorrect password.";
+                    $errors['Password'] = "Incorrect Password.";
                     if (!empty($errors)) {
                         $_SESSION['errors'] = $errors;
-                        $_SESSION['email'] = $email;
+                        $_SESSION['Email'] = $Email;
                         
                         header("Location: login.php");               
                         exit();
                     }                  
                 }
             } else {
-                $errors['email'] = "Account does not exist!";     
+                $errors['Email'] = "Account does not exist!";     
                 if (!empty($errors)) {
                     $_SESSION['errors'] = $errors;
-                    $_SESSION['email'] = $email;
+                    $_SESSION['Email'] = $Email;
                     
                     header("Location: login.php");               
                     exit();

@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -35,7 +25,10 @@
 
     include 'dbconn.php';
 
-    $sql = "SELECT * FROM product";
+    $sql = "SELECT p.ProductID, p.ProductName, p.CurrentStock, p.ProductExpiryDate, s.StorageName AS StorageName 
+        FROM product p
+        LEFT JOIN storage s ON p.StorageID = s.StorageID";
+
     $result = mysqli_query($conn, $sql);
 ?>
 
@@ -68,7 +61,16 @@
                     <tr>
                         <th> Product ID </th>
                         <th> Name </th>    
-                        <th> Current Stock  </th>
+                        <th> Current Stock </th>
+                        <th> Expiry Date </th>
+                        <th> Storage </th>
+                        <th>
+                            <form method='post' action='formCreateProduct.php'>
+                                <button type='submit'>
+                                    Add Product
+                                </button> 
+                            </form>
+                        </th> 
                     </tr>                    
                 </thead>
                 <tbody>
@@ -79,11 +81,15 @@
                                     echo "<td>" . $row["ProductID"] . "</td>";
                                     echo "<td>" . $row["ProductName"] . "</td>";
                                     echo "<td>" . $row["CurrentStock"] . "</td>";
+                                    echo "<td>" . $row["ProductExpiryDate"] . "</td>";
+                                    echo "<td>" . $row["StorageName"] . "</td>";
                                     echo "<td> 
                                             <form method='post' action='formUpdateProduct.php'>
                                                 <input type = 'hidden' name = 'ProductID' value = '". $row['ProductID']. "'/>
                                                 <input type = 'hidden' name = 'ProductName' value = '". $row['ProductName']. "'/>      
                                                 <input type = 'hidden' name = 'CurrentStock' value = '". $row['CurrentStock']. "'/>
+                                                <input type = 'hidden' name = 'ProductExpiryDate' value = '". $row['ProductExpiryDate']. "'/>
+                                                <input type='hidden' name='StorageID' value='". $row['StorageName']. "'/>
                                                 <button type='submit'>
                                                     Update
                                                 </button>
@@ -93,6 +99,7 @@
                                                 <input type = 'hidden' name = 'ProductID' value = '". $row['ProductID']. "'/>
                                                 <input type = 'hidden' name = 'ProductName' value = '". $row['ProductName']. "'/>      
                                                 <input type = 'hidden' name = 'CurrentStock' value = '". $row['CurrentStock']. "'/>
+                                                <input type = 'hidden' name = 'ProductExpiryDate' value = '". $row['ProductExpiryDate']. "'/>
                                                 <button type='submit'>
                                                     Delete
                                                 </button>

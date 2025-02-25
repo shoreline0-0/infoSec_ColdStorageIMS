@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -35,7 +25,12 @@
 
     include 'dbconn.php';
 
-    $sql = "SELECT * FROM storage";
+    $sql = "SELECT s.StorageID, s.StorageName, s.StorageMaxCapacity, s.StorageTemperature,
+        COALESCE(SUM(p.CurrentStock), 0) AS StorageUsedCapacity, 
+        (s.StorageMaxCapacity - COALESCE(SUM(p.CurrentStock), 0)) AS AvailableCapacity
+        FROM storage s
+        LEFT JOIN product p ON s.StorageID = p.StorageID
+        GROUP BY s.StorageID;";
     $result = mysqli_query($conn, $sql);
 ?>
 
@@ -68,8 +63,16 @@
                     <tr>
                         <th> Storage ID </th>
                         <th> Name </th>    
-                        <th> Capacity </th>
-                        <th> Temperature </th>
+                        <th> Max Capacity </th>
+                        <th> Used Capacity </th>
+                        <th> Temperature (°C) </th>
+                        <th>
+                            <form method='post' action='formCreateStorage.php'>
+                                <button type='submit'>
+                                    Add Storage
+                                </button> 
+                            </form>
+                        </th>
                     </tr>                    
                 </thead>
                 <tbody>
@@ -79,13 +82,15 @@
                                 echo "<tr>";
                                     echo "<td>" . $row["StorageID"] . "</td>";
                                     echo "<td>" . $row["StorageName"] . "</td>";
-                                    echo "<td>" . $row["StorageCapacity"] . "</td>";
+                                    echo "<td>" . $row["StorageMaxCapacity"] . "</td>";
+                                    echo "<td>" . $row["StorageUsedCapacity"] . "</td>";
                                     echo "<td>" . $row["StorageTemperature"] . "</td>";
                                     echo "<td> 
-                                            <form method='post' action='formEditStorage.php'>
+                                            <form method='post' action='formUpdateStorage.php'>
                                                 <input type = 'hidden' name = 'StorageID' value = '". $row['StorageID']. "'/>
                                                 <input type = 'hidden' name = 'StorageName' value = '". $row['StorageName']. "'/>      
-                                                <input type = 'hidden' name = 'StorageCapacity' value = '". $row['StorageCapacity']. "'/>
+                                                <input type = 'hidden' name = 'StorageCapacity' value = '". $row['StorageMaxCapacity']. "'/>
+                                                <input type = 'hidden' name = 'StorageCapacity' value = '". $row['StorageUsedCapacity']. "'/>
                                                 <input type = 'hidden' name = 'StorageTemperature' value = '". $row['StorageTemperature']. "'/>
                                                 <button type='submit'>
                                                     Update
@@ -95,7 +100,8 @@
                                             <form method='post' action='deleteStorage.php'>
                                                 <input type = 'hidden' name = 'StorageID' value = '". $row['StorageID']. "'/>
                                                 <input type = 'hidden' name = 'StorageName' value = '". $row['StorageName']. "'/>      
-                                                <input type = 'hidden' name = 'StorageCapacity' value = '". $row['StorageCapacity']. "'/>
+                                                <input type = 'hidden' name = 'StorageCapacity' value = '". $row['StorageMaxCapacity']. "'/>
+                                                <input type = 'hidden' name = 'StorageCapacity' value = '". $row['StorageUsedCapacity']. "'/>
                                                 <input type = 'hidden' name = 'StorageTemperature' value = '". $row['StorageTemperature']. "'/>
                                                 <button type='submit'>
                                                     Delete

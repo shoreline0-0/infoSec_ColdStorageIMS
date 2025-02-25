@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -71,8 +61,6 @@
                         <th> Name </th>
                         <th> Time </th>                            
                         <th> Status </th>
-                        <th> Resolved On: </th>
-                        <th> Resolved By: </th>
                         <th> Notes </th>
                     </tr>
                 </thead>
@@ -87,8 +75,6 @@
                                 echo "<td>" . $row["AlertName"] . "</td>";
                                 echo "<td>" . $row["AlertTime"] . "</td>";
                                 echo "<td>" . $row["Status"] . "</td>";
-                                echo "<td>" . $row["ResolvedTime"] . "</td>";
-                                echo "<td>" . $row["ResolvedBy"] . "</td>";
                                 echo "<td>" . $row["Notes"] . "</td>";
                             }
                         } else {

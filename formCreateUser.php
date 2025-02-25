@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -39,7 +29,6 @@
     $FirstName = $_SESSION['FirstName'] ?? "";
     $LastName = $_SESSION['LastName'] ?? "";
     $Email = $_SESSION['Email'] ?? "";
-
 
     unset (
         $_SESSION['errors'],
@@ -75,7 +64,7 @@
         <div class = "addProduct">
             <div class = "box1">
                 <form method='post' action='addUser.php'>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">    
+                    <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
                     <input type = 'hidden' id='UserID' name = 'UserID' />
                     <label for='FirstName'>
                         First Name:
@@ -126,6 +115,17 @@
                         </span>
                         <br>
                     <?php endif; ?>
+                    <br>
+                    <label for="Role">
+                        Select role:
+                    </label>
+                    <select id="Role" name="Role" required>
+                        <option value="" disabled selected>
+                            Select here
+                        </option>
+                        <option value="admin">Admin</option>
+                        <option value="superAdmin">Super Admin</option>
+                    </select>
                     <br><br>
                     <button class='addUser' type='submit'> 
                         Add User

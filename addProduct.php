@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -36,11 +26,13 @@
     include 'dbconn.php';
 
     $errors = [];
-    $ProductName = $CurrentStock = "";
+    $ProductName = $CurrentStock = $ProductExpiryDate = $StorageID = "";
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $ProductName = htmlspecialchars($_POST['ProductName'], ENT_QUOTES, 'UTF-8');
         $CurrentStock = filter_input(INPUT_POST, 'CurrentStock', FILTER_VALIDATE_INT);
+        $ProductExpiryDate = filter_input(INPUT_POST, 'ProductExpiryDate', FILTER_SANITIZE_STRING);
+        $StorageID = (int)$_POST['StorageID'];
 
         if (empty($ProductName)) {
             $errors['ProductName'] = "Product name required.";
@@ -48,25 +40,42 @@
             $errors['ProductName'] = "Product name too long.";
         }
     
-        if ($CurrentStock < 0) {
+        if ($CurrentStock === false || $CurrentStock < 0) {
             $errors['CurrentStock'] = "Invalid stock.";
+        }
+
+        if (empty($ProductExpiryDate)) {
+            $errors['ProductExpiryDate'] = "Expiry date required.";
         }
     
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['ProductName'] = $ProductName;
             $_SESSION['CurrentStock'] = $CurrentStock;
+            $_SESSION['ProductExpiryDate'] = $ProductExpiryDate;
             
             header("Location: formCreateProduct.php");
             exit();
     
         } else {
-            $sql = "INSERT INTO product (ProductName, CurrentStock) VALUES (?, ?)";
+            $sql = "INSERT INTO product (ProductName, CurrentStock, ProductExpiryDate, StorageID) VALUES (?, ?, ?, ?)";
             $stmt = mysqli_prepare($conn, $sql);
     
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "si", $ProductName, $CurrentStock);
+                mysqli_stmt_bind_param($stmt, "sisi", $ProductName, $CurrentStock, $ProductExpiryDate, $StorageID);
+
                 if (mysqli_stmt_execute($stmt)) {
+                    $ProductID = mysqli_insert_id($conn);
+                    $UserID = $_SESSION['UserID'];
+                    $TransactionType = "Added product";
+                    $Details = "ID: ". $ProductID ." - " . $ProductName . " (Quantity: " . $CurrentStock . ")";
+                    
+                    $sqlLog = "INSERT INTO transactionlog (TransactionType, UserID, TransactionDate, Details) VALUES (?, ?, NOW(), ?)";
+                    if ($stmtLog = mysqli_prepare($conn, $sqlLog)) {
+                        mysqli_stmt_bind_param($stmtLog, "sis", $TransactionType, $UserID, $Details);                            
+                        mysqli_stmt_execute($stmtLog);
+                        mysqli_stmt_close($stmtLog);
+                    }
                     header("Location: viewProducts.php?product=created");
                     exit();
                 } else {

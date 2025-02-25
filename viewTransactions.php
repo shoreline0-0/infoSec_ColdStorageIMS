@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -67,10 +57,9 @@
                     <tr>
                         <th> Transaction ID </th>
                         <th> Transaction Type </th>    
-                        <th> Product ID  </th>
                         <th> User ID </th>
                         <th> Transaction Date </th>
-                        <th> Notes </th>
+                        <th> Details </th>
                     </tr>                    
                 </thead>
                 <tbody>
@@ -80,16 +69,15 @@
                                 echo "<tr>";
                                     echo "<td>" . $row["TransactionID"] . "</td>";
                                     echo "<td>" . $row["TransactionType"] . "</td>";                                        
-                                    echo "<td>" . $row["ProductID"] . "</td>";
                                     echo "<td>" . $row["UserID"] . "</td>";
                                     echo "<td>" . $row["TransactionDate"] . "</td>";
-                                    echo "<td>" . $row["Notes"] . "</td>";
+                                    echo "<td>" . $row["Details"] . "</td>";
                             }
                         } else {
                             echo "<tr><td>No records.</td></tr>";
                         }
                         mysqli_close($conn);
-                    ?>
+                    ?>                    
                 </tbody>                
             </table>
         </div> 

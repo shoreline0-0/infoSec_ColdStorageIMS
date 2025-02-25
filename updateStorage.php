@@ -1,17 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
-
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
     session_start();
 
     if (!isset($_SESSION['UserID'])) {
@@ -50,7 +39,7 @@
         $StorageID = $_POST['StorageID'];
         $StorageName = htmlspecialchars($_POST['StorageName'], ENT_QUOTES, 'UTF-8');
         $StorageCapacity = filter_input(INPUT_POST, 'StorageCapacity', FILTER_VALIDATE_INT);
-        $StorageTemperature = filter_input(INPUT_POST, 'StorageTemperature', FILTER_VALIDATE_INT);
+        $StorageTemperature = filter_input(INPUT_POST, 'StorageTemperature', FILTER_VALIDATE_FLOAT);
 
         if (empty($StorageName)) {
             $errors['StorageName'] = "Storage name required.";
@@ -64,9 +53,7 @@
             $errors['StorageCapacity'] = "Invalid capacity.";
         }
 
-        if (empty($StorageTemperature)) {
-            $errors['StorageTemperature'] = "Temperature required.";
-        } elseif ($StorageTemperature > 100) {
+        if ($StorageTemperature > 100) {
             $errors['StorageTemperature'] = "Invalid temperature.";
         }
     
@@ -76,7 +63,7 @@
             $_SESSION['StorageCapacity'] = $StorageCapacity;
             $_SESSION['StorageTemperature'] = $StorageTemperature;
 
-            header("Location: formEditStorage.php");
+            header("Location: formUpdateStorage.php");
             exit();
         } else {
             $sql = 
@@ -90,8 +77,18 @@
             $stmt = mysqli_prepare($conn, $sql);
     
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "sii", $StorageName, $StorageCapacity, $StorageTemperature, $StorageID);
+                mysqli_stmt_bind_param($stmt, "siid", $StorageName, $StorageCapacity, $StorageTemperature, $StorageID);
                 if (mysqli_stmt_execute($stmt)) {
+                    $UserID = $_SESSION['UserID'];
+                    $TransactionType = "Updated storage";
+                    $Details = "ID: ". $StorageID ." - " . $StorageName . " (Capacity: " . $StorageCapacity . " , Temp " . $StorageTemperature . ")";
+                    
+                    $sqlLog = "INSERT INTO transactionlog (TransactionType, UserID, TransactionDate, Details) VALUES (?, ?, NOW(), ?)";
+                    if ($stmtLog = mysqli_prepare($conn, $sqlLog)) {
+                        mysqli_stmt_bind_param($stmtLog, "sis", $TransactionType, $UserID, $Details);                            
+                        mysqli_stmt_execute($stmtLog);
+                        mysqli_stmt_close($stmtLog);
+                    }
                     header("Location: viewStorage.php?storage=updated");
                     exit();
                 } else {

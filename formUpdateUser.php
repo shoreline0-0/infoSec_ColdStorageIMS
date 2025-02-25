@@ -1,16 +1,7 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+        header("X-Content-Type-Options: nosniff");
+    
 
     session_start();
 
@@ -48,10 +39,10 @@
     if ($UserID) {
         $sql = "SELECT * FROM users WHERE UserID = '$UserID'";
         $result = mysqli_query($conn,$sql);
-        $difficulty = mysqli_fetch_assoc($result;)
+        $users = mysqli_fetch_assoc($result);
 
-        if (!users) {
-            echo "No user found."
+        if (!$users) {
+            echo "No user found.";
         }
     }
 
@@ -82,9 +73,9 @@
     <body>
         <div class = "addProduct">
             <div class = "box1">
-                <form method='post' action='addUser.php'>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">    
-                    <input type = 'hidden' id='UserID' name = 'UserID' />
+                <form method='post' action='updateUser.php'>
+                    <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
+                    <input type = 'hidden' id='UserID' name = 'UserID' value='<?php echo htmlspecialchars($UserID);?>'/>
                     <label for='FirstName'>
                         First Name:
                     </label>
@@ -123,7 +114,7 @@
                     <?php endif; ?>
                     <br>
                     <label for='Status'>
-                    Status:
+                        Status:
                     </label>
                     <br>
                     <input type = 'text' id='Status' name = 'Status' value = '<?php echo htmlspecialchars($Status); ?>'/>
@@ -135,13 +126,17 @@
                         <br>
                     <?php endif; ?>
                     <br>
-                    <input type = 'text' id='Role' name = 'Role' value = '<?php echo htmlspecialchars($Role); ?>'/><br>
-                    <?php if (isset($errors['Role'])): ?>
-                        <span class="error"> 
-                            <?php echo $errors['Role']; ?>
-                        </span>
-                        <br>
-                    <?php endif; ?>         
+                    <br>
+                    <label for="Role">
+                        Role:
+                    </label>
+                    <select id="Role" name="Role" required>
+                        <option value="" disabled selected>
+                            Select here
+                        </option>
+                        <option value="admin" <?php if ($Role == "Admin") echo "selected"; ?>>Admin</option>
+                        <option value="superAdmin" <?php if ($Role == "Super Admin") echo "selected"; ?>>Super Admin</option>
+                    </select>
                     <br><br>
                     <button class='updateUser' type='submit'> 
                         Update User
