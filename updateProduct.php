@@ -39,6 +39,8 @@
         $ProductID = $_POST['ProductID'];
         $ProductName = htmlspecialchars($_POST['ProductName'], ENT_QUOTES, 'UTF-8');
         $CurrentStock = filter_input(INPUT_POST, 'CurrentStock', FILTER_VALIDATE_INT);
+        $ProductExpiryDate = filter_input(INPUT_POST, 'ProductExpiryDate', FILTER_SANITIZE_STRING);
+
 
         if (empty($ProductName)) {
             $errors['ProductName'] = "Product name required.";
@@ -49,26 +51,32 @@
         if ($CurrentStock === false || $CurrentStock < 0) {
             $errors['CurrentStock'] = "Invalid stock.";
         }
+
+        if (empty($ProductExpiryDate)) {
+            $errors['ProductExpiryDate'] = "Expiry date required.";
+        }
     
         if (!empty($errors)) {
             $_SESSION['errors'] = $errors;
             $_SESSION['ProductName'] = $ProductName;
             $_SESSION['CurrentStock'] = $CurrentStock;
+            $_SESSION['ProductExpiryDate'] = $ProductExpiryDate;
             
-            // header("Location: formUpdateProduct.php");
-            // exit();
+            header("Location: formUpdateProduct.php");
+            exit();
         } else {
             $sql = 
             "UPDATE product 
             SET 
                 ProductName = ?, 
-                CurrentStock = ?
+                CurrentStock = ?,
+                ProductExpiryDate = ?
             WHERE ProductID = ?";
             
             $stmt = mysqli_prepare($conn, $sql);
     
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "sii", $ProductName, $CurrentStock, $ProductID);
+                mysqli_stmt_bind_param($stmt, "sisi", $ProductName, $CurrentStock, $ProductExpiryDate, $ProductID);
                 if (mysqli_stmt_execute($stmt)) {
                     $UserID = $_SESSION['UserID'];
                     $TransactionType = "Updated product";
@@ -92,9 +100,8 @@
                         echo "MySQL Error: " . mysqli_stmt_error($stmt);
                     }
                     
-
-                    // header("Location: viewProducts.php?product=updated");
-                    // exit();
+                    header("Location: viewProducts.php?product=updated");
+                    exit();
                 } else {
                     echo "Error: " . mysqli_stmt_error($stmt);
                 }

@@ -58,7 +58,8 @@
                     <tr>
                         <th> Product ID </th>
                         <th> Name </th>    
-                        <th> Current Stock  </th>
+                        <th> Current Stock </th>
+                        <th> Expiry Date </th>
                         <th>
                             <form method='post' action='formCreateProduct.php'>
                                 <button type='submit'>
@@ -76,11 +77,13 @@
                                     echo "<td>" . $row["ProductID"] . "</td>";
                                     echo "<td>" . $row["ProductName"] . "</td>";
                                     echo "<td>" . $row["CurrentStock"] . "</td>";
+                                    echo "<td>" . $row["ProductExpiryDate"] . "</td>";
                                     echo "<td> 
                                             <form method='post' action='formUpdateProduct.php'>
                                                 <input type = 'hidden' name = 'ProductID' value = '". $row['ProductID']. "'/>
                                                 <input type = 'hidden' name = 'ProductName' value = '". $row['ProductName']. "'/>      
                                                 <input type = 'hidden' name = 'CurrentStock' value = '". $row['CurrentStock']. "'/>
+                                                <input type = 'hidden' name = 'ProductExpiryDate' value = '". $row['ProductExpiryDate']. "'/>
                                                 <button type='submit'>
                                                     Update
                                                 </button>
@@ -90,6 +93,7 @@
                                                 <input type = 'hidden' name = 'ProductID' value = '". $row['ProductID']. "'/>
                                                 <input type = 'hidden' name = 'ProductName' value = '". $row['ProductName']. "'/>      
                                                 <input type = 'hidden' name = 'CurrentStock' value = '". $row['CurrentStock']. "'/>
+                                                <input type = 'hidden' name = 'ProductExpiryDate' value = '". $row['ProductExpiryDate']. "'/>
                                                 <button type='submit'>
                                                     Delete
                                                 </button>

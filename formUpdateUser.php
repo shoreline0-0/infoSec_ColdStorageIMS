@@ -73,9 +73,9 @@
     <body>
         <div class = "addProduct">
             <div class = "box1">
-                <form method='post' action='addUser.php'>
+                <form method='post' action='updateUser.php'>
                     <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
-                    <input type = 'hidden' id='UserID' name = 'UserID' />
+                    <input type = 'hidden' id='UserID' name = 'UserID' value='<?php echo htmlspecialchars($UserID);?>'/>
                     <label for='FirstName'>
                         First Name:
                     </label>

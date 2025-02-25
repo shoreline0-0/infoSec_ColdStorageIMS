@@ -31,7 +31,8 @@
     if (
         isset($_POST['ProductID']) &&
         isset($_POST['ProductName']) &&
-        isset($_POST['CurrentStock'])
+        isset($_POST['CurrentStock']) &&
+        isset($_POST['ProductExpiryDate'])
     ) {
         
         $ProductID = $_POST['ProductID'];

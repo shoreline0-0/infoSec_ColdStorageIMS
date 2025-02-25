@@ -28,11 +28,13 @@
     $errors = $_SESSION['errors'] ?? "";
     $ProductName = $_SESSION['ProductName'] ?? "";
     $CurrentStock = $_SESSION['CurrentStock'] ?? "";
+    $ProductExpiryDate = $_SESSION['ProductExpiryDate'] ?? "";
 
     unset (
         $_SESSION['errors'],
         $_SESSION['ProductName'],
-        $_SESSION['CurrentStock']
+        $_SESSION['CurrentStock'],
+        $_SESSION['ProductExpiryDate']
     );
 ?>
 
@@ -62,7 +64,7 @@
         <div class = "addProduct">
             <div class = "box1">
                 <form method='post' action='addProduct.php'>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">    
+                    <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
                     <input type = 'hidden' id='ProductID' name = 'ProductID' />
                     <label for='ProductName'>
                         Product Name:
@@ -85,6 +87,19 @@
                     <?php if (isset($errors['CurrentStock'])): ?>
                         <span class="error"> 
                             <?php echo $errors['CurrentStock']; ?>
+                        </span>
+                        <br>
+                    <?php endif; ?>
+                    <br>
+                    <label for='ProductExpiryDate'>
+                        ProductExpiryDate:
+                    </label>
+                    <br>
+                    <input type = 'date' id='ProductExpiryDate' name = 'ProductExpiryDate' value = '<?php echo htmlspecialchars($ProductExpiryDate); ?>'  min='<?php echo date('Y-m-d'); ?>'/>
+                    <br>
+                    <?php if (isset($errors['ProductExpiryDate'])): ?>
+                        <span class="error"> 
+                            <?php echo $errors['ProductExpiryDate']; ?>
                         </span>
                         <br>
                     <?php endif; ?>

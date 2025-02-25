@@ -26,7 +26,7 @@
     include 'dbconn.php';
 
     $errors = [];
-    $ProductName = $CurrentStock = "";
+    $ProductName = $CurrentStock = $ProductExpiryDate = "";
 
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $ProductName = htmlspecialchars($_POST['ProductName'], ENT_QUOTES, 'UTF-8');
@@ -51,11 +51,11 @@
             exit();
     
         } else {
-            $sql = "INSERT INTO product (ProductName, CurrentStock) VALUES (?, ?)";
+            $sql = "INSERT INTO product (ProductName, CurrentStock, ProductExpiryDate) VALUES (?, ?, ?)";
             $stmt = mysqli_prepare($conn, $sql);
     
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "si", $ProductName, $CurrentStock);
+                mysqli_stmt_bind_param($stmt, "si", $ProductName, $CurrentStock, $ProductExpiryDate);
 
                 if (mysqli_stmt_execute($stmt)) {
                     $ProductID = mysqli_insert_id($conn);

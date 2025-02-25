@@ -73,7 +73,7 @@
             <div class = "box1">
                 <form method='post' action='updateStorage.php'>
                     <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
-                    <input type = 'hidden' id='StorageID' name = 'StorageID' />
+                    <input type = 'hidden' id='StorageID' name = 'StorageID' value='<?php echo htmlspecialchars($StorageID);?>'/>
                     <label for='StorageName'>
                         Storage Name:
                     </label>
@@ -98,6 +98,10 @@
                         </span>
                         <br>
                     <?php endif; ?>
+                    <br>
+                    <label for='StorageTemperature'>
+                        Storage Temperature:
+                    </label>
                     <br>
                     <input type = 'number' id='StorageTemperature' name = 'StorageTemperature' value = '<?php echo htmlspecialchars($StorageTemperature); ?>'/>
                     <br>
