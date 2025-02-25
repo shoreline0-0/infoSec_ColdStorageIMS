@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -70,6 +60,13 @@
                         <th> Name </th>    
                         <th> Capacity </th>
                         <th> Temperature </th>
+                        <th>
+                            <form method='post' action='formCreateStorage.php'>
+                                <button type='submit'>
+                                    Add Storage
+                                </button> 
+                            </form>
+                        </th>
                     </tr>                    
                 </thead>
                 <tbody>
@@ -82,7 +79,7 @@
                                     echo "<td>" . $row["StorageCapacity"] . "</td>";
                                     echo "<td>" . $row["StorageTemperature"] . "</td>";
                                     echo "<td> 
-                                            <form method='post' action='formEditStorage.php'>
+                                            <form method='post' action='formUpdateStorage.php'>
                                                 <input type = 'hidden' name = 'StorageID' value = '". $row['StorageID']. "'/>
                                                 <input type = 'hidden' name = 'StorageName' value = '". $row['StorageName']. "'/>      
                                                 <input type = 'hidden' name = 'StorageCapacity' value = '". $row['StorageCapacity']. "'/>

@@ -1,17 +1,7 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
-
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
+    
     session_start();
 
     if (!isset($_SESSION['UserID'])) {
@@ -56,7 +46,7 @@
             $errors['ProductName'] = "Product name too long.";
         }
     
-        if ($CurrentStock < 0) {
+        if ($CurrentStock === false || $CurrentStock < 0) {
             $errors['CurrentStock'] = "Invalid stock.";
         }
     
@@ -65,8 +55,8 @@
             $_SESSION['ProductName'] = $ProductName;
             $_SESSION['CurrentStock'] = $CurrentStock;
             
-            header("Location: formEditProduct.php");
-            exit();
+            // header("Location: formUpdateProduct.php");
+            // exit();
         } else {
             $sql = 
             "UPDATE product 
@@ -80,8 +70,31 @@
             if ($stmt) {
                 mysqli_stmt_bind_param($stmt, "sii", $ProductName, $CurrentStock, $ProductID);
                 if (mysqli_stmt_execute($stmt)) {
-                    header("Location: viewProducts.php?product=updated");
-                    exit();
+                    $UserID = $_SESSION['UserID'];
+                    $TransactionType = "Updated product";
+                    $Details = "ID: ". $ProductID ." - " . $ProductName . " (Quantity: " . $CurrentStock . ")";
+                            
+                    $sqlLog = "INSERT INTO transactionlog (TransactionType, UserID, TransactionDate, Details) VALUES (?, ?, NOW(), ?)";
+                    if ($stmtLog = mysqli_prepare($conn, $sqlLog)) {
+                        mysqli_stmt_bind_param($stmtLog, "sis", $TransactionType, $UserID, $Details);                            
+                        mysqli_stmt_execute($stmtLog);
+                        mysqli_stmt_close($stmtLog);
+                    }
+
+                    if (mysqli_stmt_execute($stmt)) {
+                        if (mysqli_stmt_affected_rows($stmt) > 0) {
+                            echo "Update successful!";
+                        } else {
+                            echo "No rows updated. Maybe values are the same?";
+                            echo "ID: ". $ProductID ." - " . $ProductName . " (Quantity: " . $CurrentStock . ")";
+                        }
+                    } else {
+                        echo "MySQL Error: " . mysqli_stmt_error($stmt);
+                    }
+                    
+
+                    // header("Location: viewProducts.php?product=updated");
+                    // exit();
                 } else {
                     echo "Error: " . mysqli_stmt_error($stmt);
                 }

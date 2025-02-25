@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -66,7 +56,19 @@
     
             if ($stmt) {
                 mysqli_stmt_bind_param($stmt, "si", $ProductName, $CurrentStock);
+
                 if (mysqli_stmt_execute($stmt)) {
+                    $ProductID = mysqli_insert_id($conn);
+                    $UserID = $_SESSION['UserID'];
+                    $TransactionType = "Added product";
+                    $Details = "ID: ". $ProductID ." - " . $ProductName . " (Quantity: " . $CurrentStock . ")";
+                    
+                    $sqlLog = "INSERT INTO transactionlog (TransactionType, UserID, TransactionDate, Details) VALUES (?, ?, NOW(), ?)";
+                    if ($stmtLog = mysqli_prepare($conn, $sqlLog)) {
+                        mysqli_stmt_bind_param($stmtLog, "sis", $TransactionType, $UserID, $Details);                            
+                        mysqli_stmt_execute($stmtLog);
+                        mysqli_stmt_close($stmtLog);
+                    }
                     header("Location: viewProducts.php?product=created");
                     exit();
                 } else {

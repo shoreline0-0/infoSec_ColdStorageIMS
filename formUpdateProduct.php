@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -45,10 +35,10 @@
     if ($ProductID) {
         $sql = "SELECT * FROM product WHERE ProductID = '$ProductID'";
         $result = mysqli_query($conn,$sql);
-        $difficulty = mysqli_fetch_assoc($result;)
+        $product = mysqli_fetch_assoc($result);
 
-        if (!product) {
-            echo "No product found."
+        if (!$product) {
+            echo "No product found.";
         }
     }
 ?>
@@ -79,7 +69,7 @@
         <div class = "updateProduct">
             <div class = "box1">
                 <form method='post' action='updateProduct.php'>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">    
+                    <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
                     <input type = 'hidden' id='ProductID' name = 'ProductID' />
                     <label for='ProductName'>
                         Product Name:

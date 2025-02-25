@@ -1,16 +1,7 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+        header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+        header("X-Content-Type-Options: nosniff");
+    
 
     session_start();
 
@@ -48,10 +39,10 @@
     if ($UserID) {
         $sql = "SELECT * FROM users WHERE UserID = '$UserID'";
         $result = mysqli_query($conn,$sql);
-        $difficulty = mysqli_fetch_assoc($result;)
+        $users = mysqli_fetch_assoc($result);
 
-        if (!users) {
-            echo "No user found."
+        if (!$users) {
+            echo "No user found.";
         }
     }
 
@@ -83,7 +74,7 @@
         <div class = "addProduct">
             <div class = "box1">
                 <form method='post' action='addUser.php'>
-                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">    
+                    <!-- <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">     -->
                     <input type = 'hidden' id='UserID' name = 'UserID' />
                     <label for='FirstName'>
                         First Name:
@@ -123,7 +114,7 @@
                     <?php endif; ?>
                     <br>
                     <label for='Status'>
-                    Status:
+                        Status:
                     </label>
                     <br>
                     <input type = 'text' id='Status' name = 'Status' value = '<?php echo htmlspecialchars($Status); ?>'/>
@@ -134,6 +125,10 @@
                         </span>
                         <br>
                     <?php endif; ?>
+                    <br>
+                    <label for='Role'>
+                        Role:
+                    </label>
                     <br>
                     <input type = 'text' id='Role' name = 'Role' value = '<?php echo htmlspecialchars($Role); ?>'/><br>
                     <?php if (isset($errors['Role'])): ?>

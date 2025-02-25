@@ -1,16 +1,6 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
+    header("Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; object-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+    header("X-Content-Type-Options: nosniff");
 
     session_start();
 
@@ -69,6 +59,13 @@
                         <th> Product ID </th>
                         <th> Name </th>    
                         <th> Current Stock  </th>
+                        <th>
+                            <form method='post' action='formCreateProduct.php'>
+                                <button type='submit'>
+                                    Add Product
+                                </button> 
+                            </form>
+                        </th>
                     </tr>                    
                 </thead>
                 <tbody>

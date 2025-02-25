@@ -1,25 +1,5 @@
 <?php
-    header("
-        Content-Security-Policy: default-src 'self;
-        script-src 'self';
-        style-src 'self';
-        img-src 'self';
-        font-src 'self';
-        object-src 'self';
-        frame-ancestors 'none':
-        base-uri 'self';
-        form-actioon 'self';
-        X-Content-Type-Options: nosniff
-    ")
-
-    session_set_cookie_params([
-        'lifetime' => 0,
-        'path' => '/',
-        'domain' => '',
-        'secure' => true,
-        'httponly' => true,
-        'samesite' => 'Strict'
-    ])
+    session_set_cookie_params(['lifetime' => 0,'path' => '/','domain' => '','secure' => true,'httponly' => true,'samesite' => 'Strict']);
 
     session_start();
 
